@@ -1,8 +1,9 @@
 package com.optiplant.inventory.controller;
 
-import com.optiplant.inventory.dto.ProductRequestDto;
-import com.optiplant.inventory.dto.ProductResponseDto;
-import com.optiplant.inventory.service.ProductService;
+import com.optiplant.inventory.dto.InventoryMovementRequestDto;
+import com.optiplant.inventory.dto.InventoryMovementResponseDto;
+import com.optiplant.inventory.dto.InventoryResponseDto;
+import com.optiplant.inventory.service.InventoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,39 +13,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/inventory")
 @RequiredArgsConstructor
-public class ProductController {
+public class InventoryController {
 
-    private final ProductService productService;
+    private final InventoryService inventoryService;
 
-    @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    @GetMapping("/branch/{branchId}")
+    public ResponseEntity<List<InventoryResponseDto>> getInventoryByBranch(@PathVariable Long branchId) {
+        return ResponseEntity.ok(inventoryService.getInventoryByBranch(branchId));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getProductById(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<ProductResponseDto> createProduct(@Valid @RequestBody ProductRequestDto requestDto) {
-        ProductResponseDto response = productService.createProduct(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> updateProduct(
-            @PathVariable Long id,
-            @Valid @RequestBody ProductRequestDto requestDto
+    @GetMapping("/branch/{branchId}/product/{productId}")
+    public ResponseEntity<InventoryResponseDto> getInventoryByBranchAndProduct(
+            @PathVariable Long branchId,
+            @PathVariable Long productId
     ) {
-        return ResponseEntity.ok(productService.updateProduct(id, requestDto));
+        return ResponseEntity.ok(inventoryService.getInventoryByBranchAndProduct(branchId, productId));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/entry")
+    public ResponseEntity<InventoryMovementResponseDto> registerEntry(
+            @Valid @RequestBody InventoryMovementRequestDto requestDto
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(inventoryService.registerEntry(requestDto));
+    }
+
+    @PostMapping("/exit")
+    public ResponseEntity<InventoryMovementResponseDto> registerExit(
+            @Valid @RequestBody InventoryMovementRequestDto requestDto
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(inventoryService.registerExit(requestDto));
     }
 }
