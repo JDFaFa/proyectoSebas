@@ -1,4 +1,4 @@
-ackage com.optiplant.inventory.enumtype;
+package com.optiplant.inventory.enumtype;
 
 public enum MovementType {
     PURCHASE_IN,

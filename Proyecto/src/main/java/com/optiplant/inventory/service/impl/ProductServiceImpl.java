@@ -7,6 +7,7 @@ import com.optiplant.inventory.repository.ProductRepository;
 import com.optiplant.inventory.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.optiplant.inventory.exception.ResourceNotFoundException;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto getProductById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
 
         return mapToResponseDto(product);
     }
@@ -35,7 +36,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponseDto createProduct(ProductRequestDto requestDto) {
         if (productRepository.existsBySku(requestDto.getSku())) {
-            throw new RuntimeException("Ya existe un producto con el SKU: " + requestDto.getSku());
+            throw new ResourceNotFoundException("Ya existe un producto con el SKU: " + requestDto.getSku());
         }
 
         Product product = Product.builder()
